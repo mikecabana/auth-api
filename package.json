@@ -1,0 +1,39 @@
+{
+  "name": "auth-api",
+  "version": "1.0.0",
+  "description": "an api to authenticate users",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mikecabana/auth-api.git"
+  },
+  "keywords": [
+    "auth",
+    "authenticate",
+    "passport",
+    "node",
+    "javascript",
+    "api"
+  ],
+  "author": "Michael Cabana",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mikecabana/auth-api/issues"
+  },
+  "homepage": "https://github.com/mikecabana/auth-api#readme",
+  "dependencies": {
+    "async": "^2.6.0",
+    "dotenv": "^5.0.1",
+    "express": "^4.16.3",
+    "jsonwebtoken": "^8.2.0",
+    "mssql": "^4.1.0",
+    "passport": "^0.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.17.3"
+  }
+}
