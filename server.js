@@ -27,19 +27,36 @@ server.post('/api/login', (req, res) => {
     });
 });
 
+
+
+server.get('/api/user', (req, res) => {
+    const userId = req.query.id;
+    const queryString = `select * from users where id = '${userId}'`;
+
+    db.queryDb(queryString, res);      
+});
+
+server.get('/api/users', (req, res) => {
+    const queryString = `select * from users`;
+
+    db.queryDb(queryString, res);      
+});
+
 server.post('/api/users/create', (req, res) => {
     const user = req.body;
     const queryString = `insert into users (fullName, email, password) values ('${user.fullName}', '${user.email}', '${user.password}')`;
 
-    db.queryDb(queryString);
-
-    res.json({
-        // fullName: user.fullName,
-        // email: user.email,
-        // password: user.password
-        message: "Created new user"
-    });
+    db.queryDb(queryString, res);      
 });
+
+server.delete('/api/user/delete', (req, res) => {
+    const userId = req.query.id;
+    const queryString = `delete from users where id = '${userId}'`;
+
+    db.queryDb(queryString, res); 
+});
+
+
 
 const authorize = (req, res, next) => {
     const bearerHeader = req.headers['authorization'];
