@@ -36,4 +36,4 @@ const queryDb = (queryString, res) => {
         });
 }
 
-module.exports = { queryDb };
+module.exports = { queryDb, sql };

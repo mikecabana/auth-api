@@ -2,10 +2,10 @@
   "name": "auth-api",
   "version": "1.0.0",
   "description": "an api to authenticate users",
-  "main": "server.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server.js"
+    "dev": "nodemon --inspect app.js"
   },
   "repository": {
     "type": "git",
@@ -34,6 +34,6 @@
     "passport": "^0.4.0"
   },
   "devDependencies": {
-    "nodemon": "^1.17.3"
+    "nodemon": "^1.17.5"
   }
 }
