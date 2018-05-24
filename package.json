@@ -27,9 +27,11 @@
   "homepage": "https://github.com/mikecabana/auth-api#readme",
   "dependencies": {
     "async": "^2.6.0",
+    "body-parser": "^1.18.2",
     "dotenv": "^5.0.1",
     "express": "^4.16.3",
     "jsonwebtoken": "^8.2.0",
+    "morgan": "^1.9.0",
     "mssql": "^4.1.0",
     "passport": "^0.4.0"
   },
