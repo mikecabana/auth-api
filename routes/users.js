@@ -76,7 +76,7 @@ router.delete('/:id', authorize, (req, res) => {
 
     users.splice(users.indexOf(user));
 
-    res.status(204);
+    res.status(204).json();
 
 });
 

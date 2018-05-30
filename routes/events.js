@@ -1,55 +1,42 @@
 const express = require('express');
 const router = express.Router();
 
+const authorize = require('./authorize').authorize;
 
-router.get('/', (req, res, next) => {
+router.get('/', authorize, (req, res) => {
+    
     res.status(200).json({
-        message: 'Handling get requests for events'
+        message: 'events all get endpoint'
     });
+
 });
 
-router.post('/', (req, res, next) => {
+router.get('/:id', authorize, (req, res) => {
 
-    const event = {
-        name: req.body.name
-    };
+    res.status(200).json({
+        message: 'events single get endpoint'
+    });
+
+});
+
+router.post('/', authorize, (req, res) => {
 
     res.status(201).json({
-        message: 'Handling post requests for events',
-        event
+        message: 'event post endpoint'    
     });
+
 });
 
-// ====================================================================
-// ====================================================================
-// ====================================================================
-// ====================================================================
-// ====================================================================
+router.put('/:id', authorize, (req, res) => {
 
-router.get('/:eventId', (req, res, next) => {
-    const id = req.params.eventId;
     res.status(200).json({
-        message: 'Handling get requests for a specific event using its id',
-        id
+        message: 'event put endpoint'
     });
 
 });
 
-router.patch('/:eventId', (req, res, next) => {
-    const id = req.params.eventId;
-    res.status(200).json({
-        message: 'Handling patch requests for a specific event using its id',
-        id
-    });
+router.delete('/:id', authorize, (req, res) => {
+    res.status(204).json();
 });
-
-router.delete('/:eventId', (req, res, next) => {
-    const id = req.params.eventId;
-    res.status(200).json({
-        message: 'Handling delete requests for a specific event using its id',
-        id
-    });
-});
-
 
 module.exports = router;
