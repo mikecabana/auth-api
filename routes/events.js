@@ -35,6 +35,15 @@ router.put('/:id', authorize, (req, res) => {
 
 });
 
+router.delete('/:eventId', authorize, (req, res) => {
+    
+    res.status(204).json({
+        message: 'event delete endpoint',
+        id
+    });
+
+});
+
 router.delete('/:id', authorize, (req, res) => {
     res.status(204).json();
 });
