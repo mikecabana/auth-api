@@ -1,5 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
+
+const users = require('./mock/users');
 
 const authorize = (req, res, next) => {
     const bearerHeader = req.headers['authorization'];
@@ -7,14 +10,22 @@ const authorize = (req, res, next) => {
         const bearer = bearerHeader.split(' ');
         const bearerToken = bearer[1];
         req.token = bearerToken;
-        next();
+
+        jwt.verify(req.token, 'my_secret', (error, decoded) => {
+            if (error) {
+                error.status = 403;
+                error.message = 'access_token has expired. please re-authenticate';
+                next(error);
+            }
+            next();
+        })
     }
     else {
-        res.sendStatus(403);
+        res.status(403);
     }
 };
 
-router.get('/', (req, res, next) => {
+router.get('/', (req, res) => {
 
     res.status(200).json({
         message: 'validate user with post to /authorize/token'
@@ -22,17 +33,18 @@ router.get('/', (req, res, next) => {
 
 });
 
-router.post('/token', (req, res, next) => {
-    // authenticate the user
-    const user = req.body;
+router.post('/token', (req, res) => {
 
-    console.log(req.body);
-    
+    const user = users.filter(u => u.firstName === req.body.firstName && u.lastName === req.body.lastName)[0];
 
     if (user) {
-        const token = jwt.sign({ user }, 'my_secret');
+        const token = jwt.sign({ user }, 'my_secret', {
+            expiresIn: '5s'
+        });
+
         res.status(201).json({
-            token
+            token,
+            user
         });
     } else {
         res.status(401).json({
@@ -41,10 +53,10 @@ router.post('/token', (req, res, next) => {
     }
 });
 
-router.get('/test', authorize, (req, res, next) => {
+router.get('/test', authorize, (req, res) => {
     res.status(200).json({
         message: 'access granted'
     });
 });
 
-module.exports = {router, authorize};
+module.exports = { router, authorize };

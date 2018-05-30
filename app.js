@@ -6,7 +6,6 @@ if (process.env.NODE_ENV !== 'production') {
 const express = require('express');
 const router = express.Router();
 const morgan = require('morgan');
-const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
 
 const app = express();

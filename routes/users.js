@@ -1,11 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const users = [{
-    id: 0,
-    firstName: 'John',
-    lastName: 'Doe'
-}];
+const users = require('./mock/users');
 
 router.get('/', (req, res) => {
 
