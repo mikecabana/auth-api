@@ -1,32 +1,85 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db/db');
+
+const users = [{
+    id: 0,
+    firstName: 'John',
+    lastName: 'Doe'
+}];
 
 router.get('/', (req, res) => {
-    const queryString = `select * from users`;
 
-    db.queryDb(queryString, res);      
+    res.status(200).json({
+        message: 'user all get endpoint',
+        users
+    });
+
 });
 
-router.get('/:id', (req, res, next) => {
-    const userId = req.query.id;
-    const queryString = `select * from users where id = '${userId}'`;
+router.get('/:id', (req, res) => {
 
-    db.queryDb(queryString, res);      
+    const userId = req.params.id;
+
+    const user = users.filter(u => u.id.toString() === userId)[0];
+
+    if (user) {
+        res.status(200).json({
+            user,
+            message: 'user single get endpoint'
+        });
+    } else {
+        res.status(404).json({
+            message: `user with id ${userId} not found`
+        });
+    }
 });
 
-router.post('/', (req, res, next) => {
-    const user = req.body;
-    const queryString = `insert into users (fullName, email, password) values ('${user.fullName}', '${user.email}', '${user.password}')`;
+router.post('/', (req, res) => {
 
-    db.queryDb(queryString, res);      
+    const user = {
+        id: users.length,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+    }
+
+    users.push(user);
+
+    res.status(201).json({
+        message: 'user post endpoint',
+        userCreated: user
+    });
 });
 
-router.delete('/', (req, res, next) => {
-    const userId = req.query.id;
-    const queryString = `delete from users where id = '${userId}'`;
+router.put('/:id', (req, res) => {
 
-    db.queryDb(queryString, res); 
+    const userId = req.params.id;
+
+    const user = users.filter(u => u.id.toString() === userId)[0];
+
+    updatedUser = Object.assign(user, {
+        firstName: req.body.firstName,
+        lastName: req.body.lastName
+    });
+    
+    users[users.indexOf(user)] = updatedUser;
+
+    res.status(200).json({
+        message: 'user put endpoint',
+        updatedUser
+    });
+
+});
+
+router.delete('/:id', (req, res) => {
+
+    const userId = req.params.id;
+
+    const user = users.filter(u => u.id.toString() === userId)[0];
+
+    users.splice(users.indexOf(user));
+
+    res.status(204);
+
 });
 
 module.exports = router;
