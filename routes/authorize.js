@@ -1,27 +1,5 @@
-const router = require('express').Router();
-
-router.get('/', (req, res, next) => {
-
-    res.statusCode(200).json({
-        message: 'validate user with post to /authorize/token'
-    });
-
-});
-
-router.post('/authorize/token', (req, res) => {
-    // authenticate the user
-    const user = req.body;
-
-    if (user) {
-        const token = jwt.sign({ user }, 'my_secret');
-        res.sendStatus(201).json({
-            token
-        });
-    } else {
-        res.sendStatus(401);
-    }
-    
-});
+const express = require('express');
+const router = express.Router();
 
 const authorize = (req, res, next) => {
     const bearerHeader = req.headers['authorization'];
@@ -36,10 +14,37 @@ const authorize = (req, res, next) => {
     }
 };
 
-router.get('/authorize/test', authorize, (req, res, next) => {
-    res.sendStatus(201).json({
+router.get('/', (req, res, next) => {
+
+    res.status(200).json({
+        message: 'validate user with post to /authorize/token'
+    });
+
+});
+
+router.post('/token', (req, res, next) => {
+    // authenticate the user
+    const user = req.body;
+
+    console.log(req.body);
+    
+
+    if (user) {
+        const token = jwt.sign({ user }, 'my_secret');
+        res.status(201).json({
+            token
+        });
+    } else {
+        res.status(401).json({
+            message: "could not authenticate user"
+        });
+    }
+});
+
+router.get('/test', authorize, (req, res, next) => {
+    res.status(200).json({
         message: 'access granted'
     });
 });
 
-module.exports = { router, authorize };
+module.exports = {router, authorize};

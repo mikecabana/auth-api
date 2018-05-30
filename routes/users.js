@@ -1,26 +1,28 @@
-const router = require('express').Router();
+const express = require('express');
+const router = express.Router();
+const db = require('../db/db');
 
-router.get('/api/users', (req, res) => {
+router.get('/', (req, res) => {
     const queryString = `select * from users`;
 
     db.queryDb(queryString, res);      
 });
 
-router.get('/api/user', (req, res) => {
+router.get('/:id', (req, res, next) => {
     const userId = req.query.id;
     const queryString = `select * from users where id = '${userId}'`;
 
     db.queryDb(queryString, res);      
 });
 
-router.post('/api/users/create', (req, res) => {
+router.post('/', (req, res, next) => {
     const user = req.body;
     const queryString = `insert into users (fullName, email, password) values ('${user.fullName}', '${user.email}', '${user.password}')`;
 
     db.queryDb(queryString, res);      
 });
 
-router.delete('/api/user/delete', (req, res) => {
+router.delete('/', (req, res, next) => {
     const userId = req.query.id;
     const queryString = `delete from users where id = '${userId}'`;
 
