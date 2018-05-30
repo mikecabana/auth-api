@@ -6,7 +6,8 @@ const users = require('./mock/users');
 
 const authorize = (req, res, next) => {
     const bearerHeader = req.headers['authorization'];
-    if (typeof bearerHeader !== 'undefined') {
+    
+    if (bearerHeader !== undefined) {
         const bearer = bearerHeader.split(' ');
         const bearerToken = bearer[1];
         req.token = bearerToken;
@@ -17,29 +18,34 @@ const authorize = (req, res, next) => {
                 error.message = 'access_token has expired. please re-authenticate';
                 next(error);
             }
-            next();
-        })
+        });
+        
+        next();
     }
     else {
-        res.status(403);
+        res.sendStatus(403);
     }
 };
 
 router.get('/', (req, res) => {
 
     res.status(200).json({
-        message: 'validate user with post to /authorize/token'
+        message: 'validate user with post to /authorize/token and a body containing userName and password like below',
+        body: {
+            userName: 'jdoe',
+            password: 'password'
+        }
     });
 
 });
 
 router.post('/token', (req, res) => {
 
-    const user = users.filter(u => u.firstName === req.body.firstName && u.lastName === req.body.lastName)[0];
+    const user = users.filter(u => u.userName === req.body.userName && u.password === req.body.password)[0];
 
     if (user) {
         const token = jwt.sign({ user }, 'my_secret', {
-            expiresIn: '5s'
+            expiresIn: '7d'
         });
 
         res.status(201).json({

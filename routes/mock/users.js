@@ -1,8 +1,11 @@
 const users = [
     {
         id: 0,
-        firstName: 'John',
-        lastName: 'Doe'
+        userName: 'mcabana',
+        firstName: 'Michael',
+        lastName: 'Cabana',
+        password: 'password',
+        type: 'admin'
     }
 ];
 

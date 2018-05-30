@@ -3,7 +3,9 @@ const router = express.Router();
 
 const users = require('./mock/users');
 
-router.get('/', (req, res) => {
+const authorize = require('./authorize').authorize;
+
+router.get('/', authorize, (req, res) => {
 
     res.status(200).json({
         message: 'user all get endpoint',
@@ -12,7 +14,7 @@ router.get('/', (req, res) => {
 
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', authorize, (req, res) => {
 
     const userId = req.params.id;
 
@@ -30,7 +32,7 @@ router.get('/:id', (req, res) => {
     }
 });
 
-router.post('/', (req, res) => {
+router.post('/', authorize, (req, res) => {
 
     const user = {
         id: users.length,
@@ -46,7 +48,7 @@ router.post('/', (req, res) => {
     });
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', authorize, (req, res) => {
 
     const userId = req.params.id;
 
@@ -66,7 +68,7 @@ router.put('/:id', (req, res) => {
 
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', authorize, (req, res) => {
 
     const userId = req.params.id;
 
