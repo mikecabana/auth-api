@@ -7,6 +7,17 @@ const express = require('express');
 const router = express.Router();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+
+mongoose.connect(process.env.COSMOS_DB_CS)
+.then(
+    () => {
+        console.log('Succesfully connected to CosmosDB');
+    },
+    (err) => {
+        console.log('CosmosDB connection error: ', err);
+    }
+);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -33,16 +44,18 @@ app.use((req, res, next) => {
 const authRoute = require('./routes/authorize').router;
 const usersRoute = require('./routes/users');
 const eventsRoute = require('./routes/events');
+const fileUploadRoute = require('./routes/file-upload');
 
 app.use('/authorize', authRoute);
-app.use('/users', usersRoute)
-app.use('/events', eventsRoute)
+app.use('/users', usersRoute);
+app.use('/events', eventsRoute);
+app.use('/documents', fileUploadRoute);
 
 // to test api is working
-app.get('/', (req, res, next) => {
+app.get('/', (req, res) => {
     res.status(200).json({
         message: "api is running",
-        routes: ['/users', '/authorize', '/authorize/token', '/authorize/test']
+        routes: ['/users', '/events', '/authorize', '/authorize/token', '/authorize/test']
     });
 });
 

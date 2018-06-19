@@ -1,83 +1,173 @@
 const express = require('express');
 const router = express.Router();
-
-const users = require('./mock/users');
-
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 const authorize = require('./authorize').authorize;
+
+const UserModel = require('../models/users');
+
 
 router.get('/', authorize, (req, res) => {
 
-    res.status(200).json({
-        message: 'user all get endpoint',
-        users
-    });
+    UserModel
+        .find()
+        .select('-__v')
+        .exec()
+        .then((docs) => {
 
+            const response = {
+                count: docs.length,
+                items: docs
+            }
+            res
+                .status(200)
+                .json(response);
+        })
+        .catch((err) => {
+            res
+                .status(500)
+                .json({
+                    error: err
+                });
+        });
 });
 
 router.get('/:id', authorize, (req, res) => {
 
     const userId = req.params.id;
 
-    const user = users.filter(u => u.id.toString() === userId)[0];
-
-    if (user) {
-        res.status(200).json({
-            user,
-            message: 'user single get endpoint'
+    UserModel
+        .findById(userId)
+        .select('-__v')
+        .exec()
+        .then((doc) => {
+            if (doc) {
+                res
+                    .status(200)
+                    .json(doc);
+            } else {
+                res
+                    .status(404)
+                    .json({
+                        message: `No valid user with id: ${userId}`
+                    });
+            }
+        })
+        .catch((err) => {
+            res
+                .status(500)
+                .json({
+                    error: err
+                });
         });
-    } else {
-        res.status(404).json({
-            message: `user with id ${userId} not found`
-        });
-    }
 });
 
 router.post('/', authorize, (req, res) => {
 
-    const user = {
-        id: users.length,
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-    }
+    UserModel.find({ email: req.body.email })
+        .exec()
+        .then(user => {
+            if (user.length >= 1) {
+                return res.status(409).json({
+                    message: 'account exists'
+                });
+            } else {
+                bcrypt.hash(req.body.password, 10, (err, hash) => {
+                    if (err) {
+                        res.status(500).json({
+                            error: err
+                        });
+                    } else {
+                        const user = new UserModel({
+                            _id: new mongoose.Types.ObjectId(),
+                            firstName: req.body.firstName,
+                            lastName: req.body.lastName,
+                            email: req.body.email,
+                            password: hash,
+                            role: req.body.role,
+                            creationTimeStamp: new Date().toISOString()
+                        });
 
-    users.push(user);
+                        user
+                            .save()
+                            .then((result) => {
+                                res
+                                    .status(201)
+                                    .json(result);
+                            })
+                            .catch((err) => {
+                                res
+                                    .status(500)
+                                    .json({
+                                        error: err
+                                    });
+                            });
+                    }
+                });
+            }
+        });
 
-    res.status(201).json({
-        message: 'user post endpoint',
-        userCreated: user
-    });
+
 });
 
-router.put('/:id', authorize, (req, res) => {
+router.patch('/:id', authorize, (req, res) => {
 
     const userId = req.params.id;
+    const updateOps = {};
 
-    const user = users.filter(u => u.id.toString() === userId)[0];
+    for (const ops of req.body) {
+        updateOps[ops.key] = ops.value;
+    }
 
-    updatedUser = Object.assign(user, {
-        firstName: req.body.firstName,
-        lastName: req.body.lastName
-    });
-    
-    users[users.indexOf(user)] = updatedUser;
-
-    res.status(200).json({
-        message: 'user put endpoint',
-        updatedUser
-    });
-
+    UserModel
+        .update({ _id: userId }, { $set: updateOps })
+        .exec()
+        .then((result) => {
+            res
+                .status(200)
+                .json(result);
+        })
+        .catch((err) => {
+            res
+                .status(500)
+                .json({
+                    error: err
+                })
+        });
 });
 
 router.delete('/:id', authorize, (req, res) => {
 
     const userId = req.params.id;
 
-    const user = users.filter(u => u.id.toString() === userId)[0];
+    UserModel
+        .remove({
+            _id: userId
+        })
+        .exec()
+        .then((result) => {
 
-    users.splice(users.indexOf(user));
+            let status;
 
-    res.status(204).json();
+            if (result.n !== 0) {
+                status = 204;
+            } else {
+                status = 404
+            }
 
+            res
+                .status(status)
+                .json({
+                    message: 'no user found'
+                });
+        })
+        .catch((err) => {
+            res
+                .status(500)
+                .json({
+                    error: err
+                });
+        });
 });
 
 module.exports = router;

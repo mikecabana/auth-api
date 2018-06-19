@@ -1,67 +1,98 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const users = require('./mock/users');
+const UserModel = require('../models/users');
+
+
+router.post('/', (req, res) => {
+
+    UserModel
+        .find({ email: req.body.email })
+        .exec()
+        .then(user => {
+            if (user.length < 1) {
+                return res.status(401).json({
+                    message: 'authorization failed'
+                });
+            } else {
+                bcrypt.compare(req.body.password, user[0].password, (err, result) => {
+                    if (err) {
+                        return res.status(401).json({
+                            message: 'authorization failed'
+                        });
+                    }
+                    if (result) {
+
+                        const token = jwt.sign(
+                            {
+                                email: user[0].email,
+                                id: user[0]._id
+                            },
+                            process.env.JWT_SECRET_KEY,
+                            {
+                                expiresIn: '1h'
+                            });
+
+                        return res.status(200).json({
+                            message: 'authorization successful',
+                            token
+                        });
+                    }
+                    res.status(401).json({
+                        message: 'authorization failed'
+                    });
+                });
+            }
+        })
+        .catch((err) => {
+            res.status(500).json({
+                error: err
+            });
+        });
+});
+
 
 const authorize = (req, res, next) => {
     const bearerHeader = req.headers['authorization'];
-    
+
     if (bearerHeader !== undefined) {
         const bearer = bearerHeader.split(' ');
         const bearerToken = bearer[1];
         req.token = bearerToken;
 
-        jwt.verify(req.token, 'my_secret', (error, decoded) => {
+        jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, decoded) => {
             if (error) {
-                error.status = 403;
+                error.status = 401;
                 error.message = 'access_token has expired. please re-authenticate';
                 next(error);
             }
         });
-        
+
         next();
     }
     else {
-        res.sendStatus(403);
+        res.sendStatus(401);
     }
 };
 
 router.get('/', (req, res) => {
 
     res.status(200).json({
-        message: 'validate user with post to /authorize/token and a body containing userName and password like below',
+        message: 'validate user with post to /authorize and a body containing email and password like below',
         body: {
-            userName: 'jdoe',
-            password: 'password'
+            email: 'johndoe@example.com',
+            password: 'a-password'
         }
     });
 
 });
 
-router.post('/token', (req, res) => {
-
-    const user = users.filter(u => u.userName === req.body.userName && u.password === req.body.password)[0];
-
-    if (user) {
-        const token = jwt.sign({ user }, 'my_secret', {
-            expiresIn: '7d'
-        });
-
-        res.status(201).json({
-            token,
-            user
-        });
-    } else {
-        res.status(401).json({
-            message: "could not authenticate user"
-        });
-    }
-});
 
 router.get('/test', authorize, (req, res) => {
     res.status(200).json({
-        message: 'access granted'
+        message: 'authorization successful'
     });
 });
 
