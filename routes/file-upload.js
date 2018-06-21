@@ -6,7 +6,7 @@ const multer = require('multer');
 const MulterAzureStorage = require('multer-azure-storage');
 const upload = multer({
     storage: new MulterAzureStorage({
-        azureStorageConnectionString: 'DefaultEndpointsProtocol=https;AccountName=honchostorage;AccountKey=8y8i1ExKV2Vj7rjkmByXRXMDSyFp2pxTudWrwScYvucr6lybD9/9zaFel9Mr58WP6ckkn0L7kmMgdsiBF84kIA==;EndpointSuffix=core.windows.net',
+        azureStorageConnectionString: process.env.AZURE_STORAGE_CS,
         containerName: 'documents',
         containerSecurity: 'blob'
     }),
