@@ -8,6 +8,7 @@ const router = express.Router();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const cors = require('cors');
 
 mongoose.connect(process.env.COSMOS_DB_CS)
 .then(
@@ -33,7 +34,7 @@ app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Request-With, Content-Type, Accept, Authorization');
 
-    if (req.method === 'OPTIONs') {
+    if (req.method === 'OPTIONS') {
         res.header('Acces-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
         return res.status(200).json({});
     }
