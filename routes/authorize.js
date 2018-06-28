@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const authorize = require('../middleware/authorize-route');
 
 const UserModel = require('../models/users');
-
 
 router.post('/', (req, res) => {
 
@@ -53,30 +53,6 @@ router.post('/', (req, res) => {
         });
 });
 
-
-const authorize = (req, res, next) => {
-    const bearerHeader = req.headers['authorization'];
-
-    if (bearerHeader !== undefined) {
-        const bearer = bearerHeader.split(' ');
-        const bearerToken = bearer[1];
-        req.token = bearerToken;
-
-        jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, decoded) => {
-            if (error) {
-                error.status = 401;
-                error.message = 'access_token has expired. please re-authenticate';
-                next(error);
-            }
-        });
-
-        next();
-    }
-    else {
-        res.sendStatus(401);
-    }
-};
-
 router.get('/', (req, res) => {
 
     res.status(200).json({
@@ -89,11 +65,10 @@ router.get('/', (req, res) => {
 
 });
 
-
 router.get('/test', authorize, (req, res) => {
     res.status(200).json({
         message: 'authorization successful'
     });
 });
 
-module.exports = { router, authorize };
+module.exports = router;

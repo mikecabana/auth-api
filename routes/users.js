@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const authorize = require('./authorize').authorize;
+const authorize = require('../middleware/authorize-route');
+
 
 const UserModel = require('../models/users');
 

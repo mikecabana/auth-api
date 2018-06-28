@@ -42,7 +42,7 @@ app.use((req, res, next) => {
 });
 
 // define routes
-const authRoute = require('./routes/authorize').router;
+const authRoute = require('./routes/authorize');
 const usersRoute = require('./routes/users');
 const eventsRoute = require('./routes/events');
 const fileUploadRoute = require('./routes/file-upload');

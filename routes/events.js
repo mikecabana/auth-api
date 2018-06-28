@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
-const authorize = require('./authorize').authorize;
+const authorize = require('../middleware/authorize-route');
 
 const EventModel = require('../models/events');
 
